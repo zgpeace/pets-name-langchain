@@ -1,52 +1,23 @@
-import streamlit as st
-import langchain_helper as lch
+from langchain.llms import OpenAI  # 导入Langchain库中的OpenAI模块
+from langchain.prompts import PromptTemplate  # 导入Langchain库中的PromptTemplate模块
+from langchain.chains import LLMChain  # 导入Langchain库中的LLMChain模块
+from dotenv import load_dotenv  # 导入dotenv库，用于加载环境变量
 
-st.title("🐶 Pets Name Generator")
+load_dotenv()  # 加载.env文件中的环境变量
 
-animal_type = st.sidebar.selectbox("What is your pet?", ("Dog", "Cat", "Hamster", "Rat", "Snake", "Lizard", "Cow"))
+def generate_pet_name(animal_type):
+    llm = OpenAI(temperature=0.7)  # 创建OpenAI模型的实例，设置temperature参数为0.7以调整生成的多样性
 
-
-if animal_type == "Dog":
-  pet_color = st.sidebar.text_area(
-    label="What color is your dog?",
-    max_chars=15
+    # 创建PromptTemplate实例，用于构造输入提示
+    prompt_template_name = PromptTemplate(
+        input_variables=['animal_type'],
+        template="I have a {animal_type} pet and I want a cool name for it. Suggest me five cool names for my pet."
     )
+    name_chain = LLMChain(llm=llm, prompt=prompt_template_name)  # 创建LLMChain实例，将OpenAI模型和PromptTemplate传入
+    response = name_chain({'animal_type': animal_type})  # 使用LLMChain生成宠物名字
 
-if animal_type == "Cat":
-  pet_color = st.sidebar.text_area(
-    label="What color is your cat?",
-    max_chars=15
-    )
+    return response  # 返回生成的名字
 
-if animal_type == "Hamster":
-  pet_color = st.sidebar.text_area(
-    label="What color is your hamster?",
-    max_chars = 15
-    )
-
-if animal_type == "Rat":
-  pet_color = st.sidebar.text_area(label="What color is your rat?", max_chars = 25)
-
-if animal_type == "Snake":
-  pet_color = st.sidebar.text_area(label="What color is your snake?", max_chars = 25)
-
-if animal_type == "Lizard":
-  pet_color = st.sidebar.text_area(
-    label="What color is your lizard?",
-    max_chars = 25
-    )
-
-if animal_type == "Cow":
-  pet_color = st.sidebar.text_area(label="What color is your cow?", max_chars = 25)
-
-with st.sidebar:
-    openai_api_key = st.text_input("OpenAI API Key", key="langchain_search_api_key_openai", type="password")
-    "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-    "[View the source code](https://github.com/rishabkumar7/pets-name-langchain/tree/main)"
-
-if pet_color:
-    if not openai_api_key:
-      st.info("Please add your OpenAI API key to continue.")
-      st.stop()
-    response = lch.generate_pet_name(animal_type, pet_color, openai_api_key)
-    st.text(response['pet_name'])
+# 当该脚本作为主程序运行时，执行以下代码
+if __name__ == "__main__":
+    print(generate_pet_name('cat'))  # 调用generate_pet_name函数，并打印返回的结果
