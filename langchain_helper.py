@@ -1,23 +1,27 @@
-from langchain.llms import OpenAI  # 导入Langchain库中的OpenAI模块
-from langchain.prompts import PromptTemplate  # 导入Langchain库中的PromptTemplate模块
-from langchain.chains import LLMChain  # 导入Langchain库中的LLMChain模块
-from dotenv import load_dotenv  # 导入dotenv库，用于加载环境变量
+# 从langchain库中导入模块
+from langchain.llms import OpenAI  # 从langchain.llms导入OpenAI模块
+from langchain.prompts import PromptTemplate  # 从langchain.prompts导入PromptTemplate模块
+from langchain.chains import LLMChain  # 从langchain.chains导入LLMChain模块
+from dotenv import load_dotenv  # 从dotenv导入load_dotenv，用于加载环境变量
+from langchain.agents import load_tools  # 从langchain.agents导入load_tools函数
+from langchain.agents import initialize_agent  # 从langchain.agents导入initialize_agent函数
+from langchain.agents import AgentType  # 从langchain.agents导入AgentType枚举类
+from langchain.tools import WikipediaQueryRun  # 从langchain.tools导入WikipediaQueryRun
+from langchain.utilities import WikipediaAPIWrapper  # 从langchain.utilities导入WikipediaAPIWrapper
 
 load_dotenv()  # 加载.env文件中的环境变量
 
-def generate_pet_name(animal_type, pet_color):
-    llm = OpenAI(temperature=0.7)  # 创建OpenAI模型的实例，设置temperature参数为0.7以调整生成的多样性
-
-    # 创建PromptTemplate实例，用于构造输入提示
-    prompt_template_name = PromptTemplate(
-        input_variables=['animal_type', 'pet_color'],
-        template="I have a {animal_type} pet and I want a cool name for it. Suggest me five cool names for my pet."
+def langchain_agent():
+    llm = OpenAI(temperature=0.5)  # 创建OpenAI模型实例，设置temperature参数为0.5以调整响应的多样性
+    tools = load_tools(["wikipedia", "llm-math"], llm=llm)  # 加载wikipedia和llm-math工具，与OpenAI模型实例一起使用
+    agent = initialize_agent(
+        tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True  # 使用指定的工具、模型、agent类型和详细模式初始化agent
     )
-    name_chain = LLMChain(llm=llm, prompt=prompt_template_name, output_key='pet_name')  # 创建LLMChain实例，将OpenAI模型和PromptTemplate传入
-    response = name_chain({'animal_type': animal_type, 'pet_color': pet_color})  # 使用LLMChain生成宠物名字
+    result = agent.run(
+        "What is the average age of a dog? Multiply the age by 3"  # 使用一个提示语来运行agent进行处理
+    )
+    print(result)  # 打印agent的输出
 
-    return response  # 返回生成的名字
-
-# 当该脚本作为主程序运行时，执行以下代码
+# 主执行检查
 if __name__ == "__main__":
-    print(generate_pet_name('cow', 'black'))  # 调用generate_pet_name函数，并打印返回的结果
+    langchain_agent()  # 如果脚本是主程序，则运行langchain_agent函数
