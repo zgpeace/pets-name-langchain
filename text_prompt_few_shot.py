@@ -79,27 +79,27 @@ print(prompt.format(fruit_type="玫瑰葡萄", occasion="爱情"))
 result = llm(prompt.format(fruit_type="火龙果", occasion="爱情"))
 print(result)
 
-# # 导入SemanticSimilarityExampleSelector和Qdrant，用于选择与输入最相关的示例。
-# from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
-# from langchain.vectorstores import Qdrant
-# from langchain.embeddings import OpenAIEmbeddings
+# 导入SemanticSimilarityExampleSelector和Qdrant，用于选择与输入最相关的示例。
+from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
+from langchain.vectorstores import Chroma
+from langchain.embeddings import OpenAIEmbeddings
 
-# # 初始化一个示例选择器，使用语义相似度选择与输入最相关的示例。
-# example_selector = SemanticSimilarityExampleSelector.from_examples(
-#     samples,
-#     OpenAIEmbeddings(),
-#     Qdrant,
-#     k=1
-# )
+# 初始化一个示例选择器，使用语义相似度选择与输入最相关的示例。
+example_selector = SemanticSimilarityExampleSelector.from_examples(
+    samples,
+    OpenAIEmbeddings(),
+    Chroma,
+    k=1
+)
 
-# # 创建一个新的FewShotPromptTemplate实例，这次使用示例选择器来选择最佳示例。
-# prompt = FewShotPromptTemplate(
-#     example_selector=example_selector, 
-#     example_prompt=prompt_sample, 
-#     suffix="水果类型：{fruit_type}\n场景：{occasion}",
-#     input_variables=["fruit_type", "occasion"],
-# )
-# # 格式化提示，用于生成特定水果类型和场景的广告文案。
-# print(prompt.format(fruit_type="钻石石榴", occasion="爱情"))
+# 创建一个新的FewShotPromptTemplate实例，这次使用示例选择器来选择最佳示例。
+prompt = FewShotPromptTemplate(
+    example_selector=example_selector, 
+    example_prompt=prompt_sample, 
+    suffix="水果类型：{fruit_type}\n场景：{occasion}",
+    input_variables=["fruit_type", "occasion"],
+)
+# 格式化提示，用于生成特定水果类型和场景的广告文案。
+print(prompt.format(fruit_type="钻石石榴", occasion="爱情"))
 
 
