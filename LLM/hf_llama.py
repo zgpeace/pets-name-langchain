@@ -15,7 +15,10 @@ tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
 
 # 加载预训练的因果语言模型。
 # 指定模型的设备为"auto"，以自动选择运行模型的最佳设备（CPU或GPU）。
-model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf", device="auto")
+model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
+# 将模型分配到适当的设备上
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
 
 # 定义一个提示文本，要求生成关于水果的爱情故事。
 prompt = "你是一位起水果运营专家，请讲一个动人的关于水果的爱情故事。"
@@ -25,7 +28,7 @@ prompt = "你是一位起水果运营专家，请讲一个动人的关于水果�
 inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
 
 # 使用模型生成回应，设置最大长度、采样参数以控制生成的文本多样性。
-outputs = model.generate(inputs["input_ids"], max_length=2000, do_sample=True, top_p=0.95, top_k=60)
+outputs = model.generate(inputs["input_ids"], max_length=1000)
 
 # 将生成的输出解码为文本，并跳过特殊标记。
 response = tokenizer.decode(outputs[0], skip_special_tokens=True)

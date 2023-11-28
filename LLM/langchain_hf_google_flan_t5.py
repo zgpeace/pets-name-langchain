@@ -14,7 +14,8 @@ from langchain.chains import LLMChain
 # 这里使用的是"google/flan-t5-small"作为repo_id来指定模型。
 # repo_id="meta-llama/Llama-2-7b-chat-hf"是另一个可选的模型。
 llm = HuggingFaceHub(
-    repo_id="google/flan-t5-small"
+    # repo_id="google/flan-t5-small"
+    repo_id="meta-llama/Llama-2-7b-chat-hf"
 )
 
 # 创建一个简单的问答模板。
