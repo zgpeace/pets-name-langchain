@@ -74,5 +74,27 @@ agent = (
     | OpenAIFunctionsAgentOutputParser()
 )
 
-response = agent.invoke({"input": "how many letters in the word educa?", "intermediate_steps": []})
-print(response)
+# response = agent.invoke({"input": "how many letters in the word educa?", "intermediate_steps": []})
+# print(response)
+
+from langchain.schema.agent import AgentFinish
+
+user_input = "how many letters in the word educa?"
+intermediate_steps = []
+while True:
+    output = agent.invoke(
+        {
+            "input": user_input,
+            "intermediate_steps": intermediate_steps,
+        }
+    )
+    if isinstance(output, AgentFinish):
+        final_result = output.return_values["output"]
+        break
+    else:
+        print(f"TOOL NAME: {output.tool}")
+        print(f"TOOL INPUT: {output.tool_input}")
+        tool = {"get_word_length": get_word_length}[output.tool]
+        observation = tool.run(output.tool_input)
+        intermediate_steps.append((output, observation))
+print(final_result)
