@@ -1,29 +1,48 @@
-# 导入 Langchain 库中的 OpenAI 模块，用于与 OpenAI 语言模型进行交互。
+# 导入与 OpenAI 语言模型交互的模块。
 from langchain.llms import OpenAI  
-# 导入 Langchain 库中的 PromptTemplate 模块，用于创建和管理提示模板。
+
+# 导入创建和管理提示模板的模块。
 from langchain.prompts import PromptTemplate  
-from langchain.agents import initialize_agent
-from langchain.agents import AgentType
-# 导入 Langchain 库中的 ChatOpenAI 类，用于创建和管理 OpenAI 聊天模型的实例。
+
+# 导入用于初始化代理和定义代理类型的模块。
+from langchain.agents import initialize_agent, AgentType
+
+# 导入创建和管理 OpenAI 聊天模型实例的类。
 from langchain.chat_models import ChatOpenAI
-from langchain.agents import AgentType, Tool, initialize_agent
-from langchain.llms import OpenAI
+
+# 导入用于定义和初始化工具的模块。
+from langchain.agents import Tool
+
+# 导入用于包装 SERP API 的实用工具。
 from langchain.utilities import SerpAPIWrapper
+
+# 导入 Langchain 的 hub 模块用于拉取预设的提示。
 from langchain import hub
+
+# 导入用于格式化代理日志的工具。
 from langchain.agents.format_scratchpad import format_log_to_str
+
+# 导入用于解析自问自答（Self-Ask）输出的解析器。
 from langchain.agents.output_parsers import SelfAskOutputParser
+
+# 导入用于执行代理的执行器。
 from langchain.agents import AgentExecutor
 
-# 导入 dotenv 库，用于从 .env 文件加载环境变量，这对于管理敏感数据如 API 密钥很有用。
+# 从 .env 文件加载环境变量，常用于管理 API 密钥等敏感数据。
 from dotenv import load_dotenv  
-
-# 调用 dotenv 库的 load_dotenv 函数来加载 .env 文件中的环境变量。
 load_dotenv()  
+
+# 设置 SERPAPI 的 API 密钥环境变量。
 import os
 os.environ["SERPAPI_API_KEY"] = 'xxx'
 
+# 初始化 OpenAI 模型。
 llm = OpenAI(temperature=0)
+
+# 初始化 SERPAPI 包装器。
 search = SerpAPIWrapper()
+
+# 定义工具列表，包括一个中间回答工具，使用搜索功能。
 tools = [
     Tool(
         name="Intermediate Answer",
@@ -32,12 +51,16 @@ tools = [
     )
 ]
 
+# 从 Langchain hub 拉取预设的提示。
 prompt = hub.pull("hwchase17/self-ask-with-search")
+
+# 将 OpenAI 模型与停止标记绑定。
 llm_with_stop = llm.bind(stop=["\nIntermediate answer:"])
+
+# 定义一个智能代理，包括输入处理、格式化和输出解析。
 agent = (
     {
         "input": lambda x: x["input"],
-        # Use some custom observation_prefix/llm_prefix for formatting
         "agent_scratchpad": lambda x: format_log_to_str(
             x["intermediate_steps"],
             observation_prefix="\nIntermediate answer: ",
@@ -48,7 +71,11 @@ agent = (
     | llm_with_stop
     | SelfAskOutputParser()
 )
+
+# 初始化代理执行器，并设置为详细模式。
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+
+# 使用代理执行器处理特定查询。
 agent_executor.invoke(
     {"input": "最近一届奥运会男子100米赛跑冠军的家乡是哪里？"}
 )
