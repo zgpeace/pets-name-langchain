@@ -34,7 +34,7 @@ load_dotenv()
 
 # 设置 SERPAPI 的 API 密钥环境变量。
 import os
-os.environ["SERPAPI_API_KEY"] = 'xxx'
+# os.environ["SERPAPI_API_KEY"] = 'xxx'
 
 # 初始化 OpenAI 模型。
 llm = OpenAI(temperature=0)
