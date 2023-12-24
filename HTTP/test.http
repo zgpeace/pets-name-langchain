@@ -5,11 +5,18 @@ GET http://example.com HTTP/1.1
 
 GET http://httpbin.org/json HTTP/1.1
 
+###
+POST http://localhost:8000/category_chain/invoke HTTP/1.1
+
+
+{
+    "text": "colors"
+}
 
 ###
 
 POST https://apejhvxcd.cloud.sealos.io/v1/chat/completions HTTP/2.0
-Authorization: 'Bearer sk-kZWcmMFO0K47H6kx68Bc7eEb622e4793B7099375340e8dF1'
+Authorization: 'Bearer sk-xxx'
 
 {
     "model":"gpt-4",
