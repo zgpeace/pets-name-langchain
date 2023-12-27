@@ -22,10 +22,14 @@ from langchain.llms import OpenAI
 from langchain.chains import LLMChain, SequentialChain
 from langchain.prompts import PromptTemplate
 
+from langchain.globals import set_debug
+
+set_debug(True)
+
 # 第一个LLMChain：生成鲜花的介绍
 llm = OpenAI(temperature=.7)
 template = """
-你是一个植物学家。给定花的名称和类型，你需要为这种花写一个200字左右的介绍。
+你是一个植物学家。给定花的名称和类型，你需要为这种花写一个300字左右的介绍。
 花名: {name}
 颜色: {color}
 植物学家: 这是关于上述花的介绍:"""
@@ -85,6 +89,6 @@ overall_chain = SequentialChain(
 # 运行链并打印结果
 result = overall_chain({
     "name": "玫瑰",
-    "color": "黑色"
+    "color": "红色"
 })
 print(result)

@@ -17,6 +17,10 @@ from dotenv import load_dotenv
 # 调用 load_dotenv 函数来加载 .env 文件中的环境变量。
 load_dotenv()  
 
+from langchain.globals import set_debug
+
+set_debug(True)
+
 # 创建剧本梗概的提示模板。
 synopsis_prompt = PromptTemplate.from_template(
     """你是一位剧作家。根据剧名，你的工作是为该剧写一个梗概。
@@ -31,6 +35,14 @@ review_prompt = PromptTemplate.from_template(
 剧情简介：
 {synopsis}
 来自纽约时报戏剧评论家的评论：
+"""
+)
+
+# 第三个LLMChain：根据剧本的介绍和评论写出一篇自媒体的文案
+promote_prompt = PromptTemplate.from_template("""
+你是好莱坞的社交媒体经理。给定一个戏剧的评论，你需要为该戏剧写一篇社交媒体的帖子，300字左右。
+{review}
+社交媒体帖子:
 """
 )
 
@@ -50,11 +62,13 @@ synopsis_chain = synopsis_prompt | llm | StrOutputParser()
 # 创建生成剧评的处理链。
 review_chain = review_prompt | llm | StrOutputParser()
 
+promote_chain = promote_prompt | llm | StrOutputParser()
+
 # 将两个处理链组合起来。
-chain = {"synopsis": synopsis_chain} | RunnablePassthrough.assign(review=review_chain)
+chain = {"synopsis": synopsis_chain} | RunnablePassthrough.assign(review=review_chain) | RunnablePassthrough.assign(prompt=promote_chain)
 
 # 使用处理链生成对特定剧本标题的梗概和评论。
-response = chain.invoke({"title": "海滩上日落时的悲剧"})
+response = chain.invoke({"title": "沙滩上的白日梦想家"})
 
 # 打印出生成的响应。
 print(response)
