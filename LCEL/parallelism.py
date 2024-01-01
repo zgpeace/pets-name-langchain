@@ -11,6 +11,7 @@ load_dotenv()
 from langchain_core.runnables import RunnableParallel
 
 # print(os.environ["OPENAI_API_KEY"])
+# print(os.environ["WANDOU_OPENAI_API_KEY"])
 
 # model = ChatOpenAI()
 model = ChatOpenAI(model="gpt-3.5-turbo")
